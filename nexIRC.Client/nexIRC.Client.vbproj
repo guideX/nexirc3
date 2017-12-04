@@ -100,7 +100,6 @@
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="Classes\Communications\StatusSocket.vb" />
-    <Compile Include="Classes\Ident.vb" />
     <Compile Include="Classes\IrcProcess.vb" />
     <Compile Include="Classes\MdiChildWindow.vb" />
     <Compile Include="Forms\frmAbout.Designer.vb">
@@ -500,6 +499,10 @@
     <ProjectReference Include="..\nexIRC.Business\nexIRC.Business.csproj">
       <Project>{93FD68D0-62C4-4C75-ABE4-4B5F946813DB}</Project>
       <Name>nexIRC.Business</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\nexIRC.Models\nexIRC.Models.csproj">
+      <Project>{a61225a9-6cbc-492a-a576-cfc0b6a6a960}</Project>
+      <Name>nexIRC.Models</Name>
     </ProjectReference>
     <ProjectReference Include="..\nexIRC.Socket\nexIRC.Sockets.csproj">
       <Project>{B9E7C877-8236-4229-9628-83B21CD2B100}</Project>

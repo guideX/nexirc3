@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using nexIRC.Business.Helpers;
 using nexIRC.Business.Models;
+using nexIRC.Models.Channels.ChannelFolder;
+
 namespace nexIRC.IrcSettings {
     /// <summary>
     /// Channel Folders

@@ -6,7 +6,6 @@ Imports nexIRC.clsIrcNumerics
 Imports nexIRC.Modules
 Imports nexIRC.nexIRC.MainWindow.clsMainWindowUI
 Imports nexIRC.Classes.Communications
-Imports Telerik.WinControls.UI
 Imports nexIRC.Settings
 Imports nexIRC.Business.Enums
 Imports nexIRC.Business.Helpers
@@ -121,7 +120,7 @@ Namespace IRC.Status
             Public sUnknowns As gUnknowns
             Public sUnsupported As gUnsupported
             Public sServerLinks As gLinks
-            Public sSocket As StatusSocket
+            Public sSocket As StatusSocketObject
             Public sWindow As frmStatus
             Public sWindowBarItem As ToolStripItem
             Public sWindowBarItemSet As Boolean
@@ -171,6 +170,10 @@ Namespace IRC.Status
                 Throw ex 'ProcessError(ex.Message, "Public Sub Window_Resize(_ChannelIndex As Integer)")
             End Try
         End Sub
+
+        Public Function Port(statusID) As Integer
+            Return lStatusObjects.sStatusObject(statusID).sSocket.Port
+        End Function
         Public Sub ResetForeMostWindows()
             Try
                 For i As Integer = 1 To lStatusObjects.sCount
@@ -265,20 +268,19 @@ Namespace IRC.Status
         End Sub
         Public Function Create(ByVal lIRCSettings As Settings.gIRC, ByVal lServerSettings As Settings.gServers) As Integer
             Try
-                Dim msg As String, i As Integer
+                Dim initialText As String
                 lStatusObjects.sCount = lStatusObjects.sCount + 1
                 lStatusObjects.sIndex = lStatusObjects.sCount
-                i = lStatusObjects.sIndex
-                With lStatusObjects.sStatusObject(i)
+                With lStatusObjects.sStatusObject(lStatusObjects.sIndex)
                     ReDim .sNotifyItems.nNotify(lSettings.lArraySizes.aNotifyItems)
                     ReDim .sServerLinks.sLink(lSettings.lArraySizes.aServerLinks)
                     ReDim .sPrivateMessages.pPrivateMessage(lSettings.lArraySizes.aQueries)
                     .sServerIndex = lServerSettings.sIndex
                     .sPrimitives.sNetworkIndex = lServerSettings.sServer(lServerSettings.sIndex).sNetworkIndex
-                    .sNickBot = New NickBot(i)
+                    .sNickBot = New NickBot(lStatusObjects.sIndex)
                     .sWindow = New frmStatus
                     .sWindow.mdiChildWindow.FormType = MdiChildWindow.FormTypes.Status
-                    .sWindow.mdiChildWindow.MeIndex = i
+                    .sWindow.mdiChildWindow.MeIndex = lStatusObjects.sIndex
                     .sVisible = True
                     .sPrimitives.sEmail = lSettings.lIRC.iEMail
                     .sPrimitives.sPass = lSettings.lIRC.iPass
@@ -294,23 +296,22 @@ Namespace IRC.Status
                     .sWindow.Width = lSettings.lIRC.iSettings.sWindowSizes.lStatus.wWidth
                     .sWindow.Height = lSettings.lIRC.iSettings.sWindowSizes.lStatus.wHeight
                     If lSettings.lIRC.iSettings.sAutoConnect = True Then .sWindow.lAutoConnectDelayTimer.Enabled = True
-                    msg = NewInitialText(i)
+                    initialText = NewInitialText(lServerSettings.sIndex, lStatusObjects.sIndex)
                     .sPrimitives.sRemoteIP = lSettings.lServers.sServer(lSettings.lServers.sIndex).sIP
                     .sPrimitives.sRemotePort = lSettings.lServers.sServer(lSettings.lServers.sIndex).sPort
-                    NickName(i) = lSettings.lIRC.iNicks.nNick(lSettings.lIRC.iNicks.nIndex).nNick
-                    .sWindow.Text = msg
-                    .sPrimitives.sInitialText = msg
-                    .sWindowBarItem = mdiMain.AddWindowBar(msg, gWindowBarImageTypes.wStatus)
-                    .sWindowBarItem.Tag = Trim(i.ToString)
+                    NickName(lStatusObjects.sIndex) = lSettings.lIRC.iNicks.nNick(lSettings.lIRC.iNicks.nIndex).nNick
+                    .sWindow.Text = initialText
+                    .sPrimitives.sInitialText = initialText
+                    .sWindowBarItem = mdiMain.AddWindowBar(initialText, gWindowBarImageTypes.wStatus)
+                    .sWindowBarItem.Tag = Trim(initialText.ToString)
                     .sWindowBarItemSet = True
-                    .sDescription = msg
+                    .sDescription = initialText
                     .sTreeNode = mdiMain.tvwConnections.Nodes.Add("", .sDescription, 2, 2)
                     .sTreeNodeVisible = True
                     .sTreeNodeStatus = .sTreeNode.Nodes.Add(lServerSettings.sServer(lServerSettings.sIndex).sIP, "Status", 0, 0)
                     .sTreeNode.Expand()
                     .sWindow.tmrQuickFocus.Enabled = True
                 End With
-                ActiveIndex = i
                 Return lStatusObjects.sCount
             Catch ex As Exception
                 Throw ex
@@ -331,7 +332,7 @@ Namespace IRC.Status
                 Dim _StatusText As String
                 SetRemoteSettings(_Index, lSettings.lServers.sServer(lSettings.lServers.sIndex).sIP, lSettings.lServers.sServer(lSettings.lServers.sIndex).sPort)
                 NetworkIndex(_Index) = lSettings.lServers.sServer(lSettings.lServers.sIndex).sNetworkIndex
-                _StatusText = lStatus.NewInitialText(_Index)
+                _StatusText = lStatus.NewInitialText(lSettings.lServers.sIndex, _Index)
                 Caption(_Index) = _StatusText
                 TreeNodeText(_Index) = _StatusText
                 Description(_Index) = _StatusText
@@ -920,14 +921,11 @@ Namespace IRC.Status
                 Throw ex 'ProcessError(ex.Message, "Public Sub SendQuitMessage(ByVal lIndex As Integer)")
             End Try
         End Sub
-        Public ReadOnly Property NewInitialText(ByVal _Index As Integer) As String
+        Public ReadOnly Property NewInitialText(ByVal serverIndex As Integer, ByVal statusIndex As Integer) As String
             Get
-                Try
-                    Return Modules.IrcSettings.IrcNetworks.GetById(lSettings.lServers.sServer(lSettings.lServers.sIndex).sNetworkIndex).Description & " (" & Trim(_Index.ToString().Trim()) & ")"
-                Catch ex As Exception
-                    Throw ex 'ProcessError(ex.Message, "Public ReadOnly Property NewInitialText(ByVal lIndex As Integer) As String")
-                    Return Nothing
-                End Try
+                'Dim status = lStatus.lStatusObjects.sStatusObject(statusIndex)
+                Dim server = lSettings.lServers.sServer(serverIndex)
+                Return Modules.IrcSettings.IrcNetworks.GetById(server.sNetworkIndex).Description & " (" & Trim(statusIndex.ToString().Trim()) & ")"
             End Get
         End Property
         Public Function InitialText(ByVal lIndex As Integer) As String
@@ -1676,7 +1674,7 @@ Namespace IRC.Status
                         lSettings.AddToRecientServerList(lSettings.FindServerIndexByIp(.sPrimitives.sRemoteIP))
                         lSettings.SaveRecientServers()
                         .sConnecting = True
-                        .sSocket = New StatusSocket()
+                        .sSocket = New StatusSocketObject()
                         .sSocket.NewSocket(_StatusIndex, .sWindow)
                         .sSocket.ConnectSocket(.sPrimitives.sRemoteIP, .sPrimitives.sRemotePort)
                         .sWindow.Visible = True
@@ -1816,23 +1814,10 @@ Namespace IRC.Status
                 Throw ex 'ProcessError(ex.Message, "Public Sub CloseStatusConnection(ByVal _StatusIndex As Integer, ByVal _CloseSocket As Boolean)")
             End Try
         End Sub
-        Public ReadOnly Property StatusSocketLocalPort(ByVal _Index As Integer) As Long
-            Get
-                Try
-                    If (Not lStatusObjects.sStatusObject(_Index).sSocket Is Nothing) Then
-                        Return lStatusObjects.sStatusObject(_Index).sSocket.ReturnLocalPort
-                    End If
-                    Return 0
-                Catch ex As Exception
-                    Throw ex
-                    Return Nothing
-                End Try
-            End Get
-        End Property
         Public Sub NewStatusSocket(ByVal _Index As Integer)
             Try
                 With lStatusObjects.sStatusObject(_Index)
-                    .sSocket = New StatusSocket
+                    .sSocket = New StatusSocketObject
                     .sSocket.NewSocket(_Index, lStatusObjects.sStatusObject(_Index).sWindow)
                 End With
             Catch ex As Exception

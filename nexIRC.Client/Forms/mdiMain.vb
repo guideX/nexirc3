@@ -225,19 +225,19 @@ Public Class mdiMain
     End Sub
 
     Private Sub lMainWindowUI_SetBackgroundColor() Handles lMainWindowUI.SetBackgroundColor
-        Try
-            Dim ctl As Control
-            Dim ctlMDI As MdiClient
-            For Each ctl In Me.Controls
-                Try
-                    ctlMDI = CType(ctl, MdiClient)
-                    ctlMDI.BackColor = Me.BackColor
-                Catch exc As InvalidCastException
-                End Try
-            Next ctl
-        Catch ex As Exception
-            Throw ex
-        End Try
+        'Try
+        'Dim ctl As Control
+        'Dim ctlMDI As MdiClient
+        'For Each ctl In Me.Controls
+        'Try
+        'ctlMDI = CType(ctl, MdiClient)
+        'ctlMDI.BackColor = Me.BackColor
+        'Catch exc As InvalidCastException
+        'End Try
+        'Next ctl
+        'Catch ex As Exception
+        'Throw ex
+        'End Try
     End Sub
 
     Private Sub tmrFirstFocus_Tick(sender As System.Object, e As System.EventArgs) Handles tmrFirstFocus.Tick

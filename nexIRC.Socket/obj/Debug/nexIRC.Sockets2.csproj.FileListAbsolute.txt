@@ -1,0 +1,12 @@
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\nexIRC.Sockets.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\nexIRC.Sockets.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.Themes.Office2010Black.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.UI.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\TelerikCommon.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.UI.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\TelerikCommon.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\obj\Debug\nexIRC.Sockets2.csprojResolveAssemblyReference.cache
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.pdb

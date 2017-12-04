@@ -1,0 +1,6 @@
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.BusinessTests\bin\Debug\nexIRC.BusinessTests.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.BusinessTests\bin\Debug\nexIRC.BusinessTests.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.BusinessTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.BusinessTests\obj\Debug\nexIRC.BusinessTests.csprojResolveAssemblyReference.cache
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.BusinessTests\obj\Debug\nexIRC.BusinessTests.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.BusinessTests\obj\Debug\nexIRC.BusinessTests.pdb

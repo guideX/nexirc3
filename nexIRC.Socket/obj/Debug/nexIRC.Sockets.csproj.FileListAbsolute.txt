@@ -3,11 +3,6 @@ C:\dev\team-nexgen\nexirc\nexIRC.Socket\bin\Debug\nexIRC.Sockets.pdb
 C:\dev\team-nexgen\nexirc\nexIRC.Socket\obj\Debug\nexIRC.Sockets.dll
 C:\dev\team-nexgen\nexirc\nexIRC.Socket\obj\Debug\nexIRC.Sockets.pdb
 C:\dev\team-nexgen\nexirc\nexIRC.Socket\obj\Debug\nexIRC.Sockets.csprojResolveAssemblyReference.cache
-C:\dev\team-nexgen\nexirc\nexirc3\nexIRC.Socket\bin\Debug\nexIRC.Sockets.dll
-C:\dev\team-nexgen\nexirc\nexirc3\nexIRC.Socket\bin\Debug\nexIRC.Sockets.pdb
-C:\dev\team-nexgen\nexirc\nexirc3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.dll
-C:\dev\team-nexgen\nexirc\nexirc3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.pdb
-C:\dev\team-nexgen\nexirc\nexirc3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.csprojResolveAssemblyReference.cache
 C:\dev\team-nexgen\nexirc\nexirc-8468b7f80a9e4d977ef854d7918ed66defdefcbb\nexIRC.Socket\bin\Debug\nexIRC.Sockets.dll
 C:\dev\team-nexgen\nexirc\nexirc-8468b7f80a9e4d977ef854d7918ed66defdefcbb\nexIRC.Socket\bin\Debug\nexIRC.Sockets.pdb
 C:\dev\team-nexgen\nexirc\nexirc-8468b7f80a9e4d977ef854d7918ed66defdefcbb\nexIRC.Socket\obj\Debug\nexIRC.Sockets.csprojResolveAssemblyReference.cache
@@ -18,3 +13,14 @@ D:\dev\team-nexgen\nexirc\bb\nexIRC.Socket\bin\Debug\nexIRC.Sockets.pdb
 D:\dev\team-nexgen\nexirc\bb\nexIRC.Socket\obj\Debug\nexIRC.Sockets.csprojResolveAssemblyReference.cache
 D:\dev\team-nexgen\nexirc\bb\nexIRC.Socket\obj\Debug\nexIRC.Sockets.dll
 D:\dev\team-nexgen\nexirc\bb\nexIRC.Socket\obj\Debug\nexIRC.Sockets.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.csprojResolveAssemblyReference.cache
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\nexIRC.Sockets.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\nexIRC.Sockets.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.UI.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\TelerikCommon.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\Telerik.WinControls.UI.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\bin\Debug\TelerikCommon.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Socket\obj\Debug\nexIRC.Sockets.pdb

@@ -1,12 +1,11 @@
 ﻿Option Explicit On
 Option Strict On
-Imports System
 Imports System.Net
-Imports nexIRC.IRC.Channels.clsChannel
 Imports nexIRC.clsIrcNumerics
 Imports nexIRC.Modules
 Imports nexIRC.Business.Enums
 Imports nexIRC.Business.Helpers
+Imports nexIRC.Business.Repositories
 
 Public Class clsIrcNumericHelper
     Public l001 As String, l002 As String, l003 As String, l004 As String, l311 As String, l312 As String, l313 As String, l316 As String, l317 As String, l319 As String, l378 As String, l379 As String, l401 As String, l250 As String, l251 As String, l252 As String, l253 As String, l254 As String, l255 As String, l265 As String, l266 As String, l616 As String, l615 As String, lWhoisUser As String
@@ -249,7 +248,7 @@ Public Class clsIrcNumericHelper
             msg = splt(UBound(splt)).Trim().ToLower()
             With lSettings_DCC.lDCC.dIgnorelist
                 For i = 1 To .dCount
-                    If (.dItem(i).dType = Settings2.gDCCIgnoreType.dFileTypes) Then
+                    If (.dItem(i).dType = gDCCIgnoreType.dFileTypes) Then
                         If (.dItem(i).dData.Trim().ToLower() = msg.Trim().ToLower()) Then
                             result = True
                             Exit For
@@ -297,7 +296,7 @@ Public Class clsIrcNumericHelper
                         mdiMain.tspDCCToolBar.Visible = True
                         mdiMain.lblUser.Tag = msg & Environment.NewLine & Trim(splt(6)) & Environment.NewLine & Trim(splt(7)) & Environment.NewLine & Trim(splt(5)) & Environment.NewLine & Trim(splt(8))
                     ElseIf lSettings_DCC.lDCC.dSendPrompt = eDccPrompt.eAcceptAll Then
-                        lForm.InitDCCGet(Trim(msg), Trim(splt(6)), Trim(splt(7)), Trim(splt(5)), Trim(splt(8)))
+                        lForm.InitDCCGet(Trim(msg), Trim(splt(6)), Convert.ToInt32(splt(7).Trim()), Trim(splt(5)), Trim(splt(8)))
                         'animate.Animate(lForm, animate.Effect.Center, 200, 1)
                         lForm.Show()
                     ElseIf lSettings_DCC.lDCC.dSendPrompt = eDccPrompt.eIgnore Then

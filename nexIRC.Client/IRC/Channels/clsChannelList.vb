@@ -1,10 +1,10 @@
 ﻿Option Explicit On
 Option Strict On
 Imports nexIRC.Modules
-Imports Telerik.WinControls.UI
-Imports nexIRC.clsCommandTypes
 Imports nexIRC.Business.Helpers
 Imports nexIRC.Business.Enums
+Imports nexIRC.Models.ChannelList
+Imports nexIRC.Models.Forms
 
 Public Class clsChannelListUI
     Public Event SaveColumnWidths()
@@ -101,34 +101,13 @@ Public Class clsChannelListUI
     End Sub
 End Class
 Public Class clsChannelList
-    Public Structure gChannelListItem
-        Public cChannel As String
-        Public cTopic As String
-        Public cUserCount As Integer
-    End Structure
-    Public Structure gChannelListItems
-        Public cCount As Integer
-        Public cChannelListItem() As gChannelListItem
-    End Structure
-    Public Structure gChannelList
-        Public cWindow As frmChannelList
-        Public cVisible As Boolean
-        Public cTreeNode As TreeNode
-        Public cTreeNodeVisible As Boolean
-        Public cItem As gChannelListItems
-        Public cStatusIndex As Integer
-        Public cStatusDescription As String
-    End Structure
-    Public Structure gChannelLists
-        Public cChannelList() As gChannelList
-        Public cCount As Integer
-    End Structure
-    Private lChannelLists As gChannelLists
+
+    Private lChannelLists As List(Of ChannelListModel)
     Public Function ReturnChannelListIndex(ByVal _StatusIndex As Integer) As Integer
         Try
             Dim n As Integer = 0
-            For i As Integer = 1 To lChannelLists.cCount
-                If lChannelLists.cChannelList(i).cStatusIndex = _StatusIndex Then
+            For i As Integer = 1 To lChannelLists.Count
+                If lChannelLists(i).StatusID = _StatusIndex Then
                     n = i
                 End If
             Next i
@@ -140,8 +119,8 @@ Public Class clsChannelList
     End Function
     Public Function ReturnStatusIndex(ByVal _ChannelListIndex As Integer) As Integer
         Try
-            If (lChannelLists.cChannelList IsNot Nothing) Then
-                Return lChannelLists.cChannelList(_ChannelListIndex).cStatusIndex
+            If (lChannelLists IsNot Nothing) Then
+                Return lChannelLists(_ChannelListIndex).StatusID
             Else
                 Return 0
             End If
@@ -153,8 +132,8 @@ Public Class clsChannelList
     Public Sub NewChannelList(ByVal _StatusIndex As Integer)
         Try
             Dim b As Boolean = False, _ChannelListIndex As Integer
-            For i As Integer = 1 To lChannelLists.cCount
-                If _StatusIndex = lChannelLists.cChannelList(i).cStatusIndex Then
+            For i As Integer = 1 To lChannelLists.Count
+                If _StatusIndex = lChannelLists(i).StatusID Then
                     _ChannelListIndex = i
                     b = True
                 End If
@@ -163,17 +142,17 @@ Public Class clsChannelList
                 lChannelLists.cCount = lChannelLists.cCount + 1
                 ReDim lChannelLists.cChannelList(lChannelLists.cCount)
                 With lChannelLists.cChannelList(lChannelLists.cCount)
-                    .cStatusIndex = _StatusIndex
-                    .cTreeNodeVisible = True
-                    .cTreeNode = lStatus.GetObject(_StatusIndex).sTreeNode.Nodes.Add("Channel List", "Channel List", 1)
-                    .cWindow = New frmChannelList
+                    .StatusID = _StatusIndex
+                    .TreeNodeVisible = True
+                    .TreeNode = lStatus.GetObject(_StatusIndex).sTreeNode.Nodes.Add("Channel List", "Channel List", 1)
+                    .Window = New NexircFormModel
                 End With
             Else
                 With lChannelLists.cChannelList(_ChannelListIndex)
-                    .cStatusIndex = _StatusIndex
-                    .cWindow = New frmChannelList
-                    .cItem = New gChannelListItems()
-                    .cWindow.MeIndex = _ChannelListIndex
+                    .StatusID = _StatusIndex
+                    .Window = New NexircFormModel
+                    .Items = New List(Of ChannelListItemModel)
+                    .Window.MeIndex = _ChannelListIndex
                 End With
             End If
         Catch ex As Exception
@@ -183,7 +162,7 @@ Public Class clsChannelList
     Public Sub Clear(ByVal _ChannelListIndex As Integer)
         Try
             With lChannelLists.cChannelList(_ChannelListIndex)
-                .cWindow.lvwChannels.Clear()
+                .Window.lvwChannels.Clear()
             End With
         Catch ex As Exception
             Throw ex
@@ -193,11 +172,11 @@ Public Class clsChannelList
         Try
             If lChannelLists.cCount <> 0 Then
                 With lChannelLists.cChannelList(_ChannelListIndex)
-                    If .cVisible = True Then .cWindow.Close()
-                    If .cTreeNodeVisible = True Then .cTreeNode = Nothing
-                    .cTreeNodeVisible = False
-                    .cVisible = False
-                    .cWindow = Nothing
+                    If .Visible = True Then .Window.Close()
+                    If .TreeNodeVisible = True Then .TreeNode = Nothing
+                    .TreeNodeVisible = False
+                    .Visible = False
+                    .Window = Nothing
                 End With
             End If
         Catch ex As Exception
@@ -207,7 +186,7 @@ Public Class clsChannelList
     Public WriteOnly Property StatusDescription(ByVal _ChannelListIndex As Integer) As String
         Set(ByVal _StatusDescription As String)
             Try
-                lChannelLists.cChannelList(_ChannelListIndex).cStatusDescription = _StatusDescription
+                lChannelLists.cChannelList(_ChannelListIndex).Description = _StatusDescription
             Catch ex As Exception
                 Throw ex
             End Try
@@ -217,12 +196,12 @@ Public Class clsChannelList
         Try
             With lChannelLists.cChannelList(_ChannelListIndex)
                 '.cWindow.Text = "Channel List [" & lStatusObjects.sStatusObject(lStatusIndex).sDescription & "]"
-                .cWindow = New frmChannelList()
-                .cWindow.Text = "Channel List [" & lStatus.Window(.cStatusIndex).Text & "]"
-                .cWindow.lvwChannels.Items.Clear()
-                .cWindow.Show()
+                .Window = New NexircFormModel()
+                .Window.Text = "Channel List [" & lStatus.Window(.StatusID).Text & "]"
+                .Window.lvwChannels.Items.Clear()
+                .Window.Show()
                 SetItems(_ChannelListIndex)
-                .cWindow.MeIndex = _ChannelListIndex
+                .Window.MeIndex = _ChannelListIndex
             End With
         Catch ex As Exception
             Throw ex
@@ -232,10 +211,10 @@ Public Class clsChannelList
         Try
             Dim _Item As ListViewItem
             With lChannelLists.cChannelList(_ChannelListIndex)
-                For i As Integer = 1 To .cItem.cCount
-                    _Item = .cWindow.lvwChannels.Items.Add(.cItem.cChannelListItem(i).cChannel)
-                    _Item.SubItems.Add(.cItem.cChannelListItem(i).cTopic)
-                    _Item.SubItems.Add(.cItem.cChannelListItem(i).cUserCount.ToString)
+                For i As Integer = 1 To .Items.Count
+                    _Item = .Window.lvwChannels.Items.Add(.Items(i).Channel)
+                    _Item.SubItems.Add(.Items(i).Topic)
+                    _Item.SubItems.Add(.Items(i).UserCount.ToString)
                 Next i
             End With
         Catch ex As Exception
@@ -243,39 +222,35 @@ Public Class clsChannelList
         End Try
     End Sub
     Public Sub Close(ByVal _ChannelListIndex As Integer)
-        Try
+        If (lChannelLists.cChannelList IsNot Nothing) Then
             With lChannelLists.cChannelList(_ChannelListIndex)
-                If .cVisible = True Then .cWindow.Close()
+                If .Visible = True Then .Window.Close()
             End With
-        Catch ex As Exception
-            Throw ex
-        End Try
+        End If
     End Sub
     Public Sub HideTreeNode(ByVal _ChannelListIndex As Integer)
-        Try
+        If (lChannelLists.cChannelList IsNot Nothing) Then
             With lChannelLists.cChannelList(_ChannelListIndex)
-                If .cTreeNodeVisible = True Then
-                    .cTreeNodeVisible = False
-                    .cTreeNode.Remove()
+                If .TreeNodeVisible = True Then
+                    .TreeNodeVisible = False
+                    .TreeNode.Remove()
                 End If
             End With
-        Catch ex As Exception
-            Throw ex
-        End Try
+        End If
     End Sub
     Public Sub DoubleClick(ByVal _ChannelListIndex As Integer)
         Try
             With lChannelLists.cChannelList(_ChannelListIndex)
-                If .cVisible = False Then
+                If .Visible = False Then
                     Display(_ChannelListIndex)
                 Else
-                    .cWindow.Focus()
+                    .Window.Focus()
                     Exit Sub
                 End If
             End With
             With lChannelLists.cChannelList(_ChannelListIndex)
                 'With lStatusObjects.sStatusObject(n)
-                If .cVisible = False Then
+                If .Visible = False Then
                     'Display(_ChannelListIndex)
                     SetItems(_ChannelListIndex)
                     '.cWindow = New frmChannelList
@@ -285,7 +260,7 @@ Public Class clsChannelList
                     'SetChannelListItems(n, .sChannelList.cWindow.lvwChannels)
                 Else
                     'mdiMain.SetWindowFocus(.sChannelList.cWindow)
-                    mdiMain.SetWindowFocus(.cWindow)
+                    mdiMain.SetWindowFocus(.Window)
                 End If
             End With
         Catch ex As Exception
@@ -296,8 +271,8 @@ Public Class clsChannelList
         Try
             Dim _Result As Boolean = False
             With lChannelLists.cChannelList(_ChannelListIndex)
-                For i As Integer = 1 To .cItem.cCount
-                    If .cItem.cChannelListItem(i).cChannel.ToLower() = _Channel.ToLower() = True Then
+                For i As Integer = 1 To .Items.Count
+                    If .Items(i).Channel.ToLower() = _Channel.ToLower() = True Then
                         _Result = True
                     End If
                 Next i
@@ -308,56 +283,40 @@ Public Class clsChannelList
             Return Nothing
         End Try
     End Function
-    Public Sub Add(ByVal _ChannelListIndex As Integer, ByVal _Data As String)
-        Try
-            Dim splt() As String, splt2() As String, i As Integer, msg As String
-            If Left(_Data, 1) <> ":" Then _Data = ":" & _Data
-            If Len(_Data) <> 0 Then
-                _Data = Trim(_Data)
-                splt = Split(_Data, ":")
-                splt2 = Split(splt(1), " ")
-                i = Len(splt2(0)) + Len(splt2(1)) + Len(splt2(2)) + Len(splt2(3)) + Len(splt2(4)) + 7
-                msg = Right(_Data, Len(_Data) - i)
-                msg = TextHelper.StripColorCodes(msg)
-                If msg = Nothing Then msg = ""
-                If DoesChannelExist(_ChannelListIndex, splt2(3)) = False Then
-                    With lChannelLists.cChannelList(_ChannelListIndex)
-                        .cItem.cCount = .cItem.cCount + 1
-                        ReDim Preserve .cItem.cChannelListItem(.cItem.cCount)
-                        With .cItem.cChannelListItem(.cItem.cCount)
-                            .cChannel = splt2(3)
-                            .cTopic = msg
-                            If IsNumeric(splt2(4)) = True Then
-                                .cUserCount = CType(splt2(4).Trim, Integer)
-                            End If
-                        End With
-                        If .cTreeNodeVisible = False Then
-                            .cTreeNodeVisible = True
-                        End If
-                    End With
+    Public Sub Add(ByVal channelListID As Integer, ByVal data As String)
+        Dim splt() As String, splt2() As String, i As Integer, msg As String
+        If Left(data, 1) <> ":" Then data = ":" & data
+        If Len(data) <> 0 Then
+            data = Trim(data)
+            splt = Split(data, ":")
+            splt2 = Split(splt(1), " ")
+            i = Len(splt2(0)) + Len(splt2(1)) + Len(splt2(2)) + Len(splt2(3)) + Len(splt2(4)) + 7
+            msg = Right(data, Len(data) - i)
+            msg = TextHelper.StripColorCodes(msg)
+            If msg = Nothing Then msg = ""
+            If DoesChannelExist(channelListID, splt2(3)) = False Then
+                Dim item = New ChannelListItemModel
+                item.Channel = splt2(3)
+                item.Topic = msg
+                If (IsNumeric(splt2(4))) Then
+                    item.UserCount = Convert.ToInt32(splt2(4))
+                End If
+                lChannelLists.cChannelList(channelListID).Items.Add(item)
+                If (Not lChannelLists.cChannelList(channelListID).TreeNodeVisible) Then
+                    lChannelLists.cChannelList(channelListID).TreeNodeVisible = True
                 End If
             End If
-        Catch ex As Exception
-            Throw ex
-        End Try
+        End If
     End Sub
     Public Sub SetOpen(ByVal _ChannelListIndex As Integer)
-        Try
-            With lChannelLists.cChannelList(_ChannelListIndex)
-                .cVisible = True
-            End With
-        Catch ex As Exception
-            Throw ex
-        End Try
+        With lChannelLists.cChannelList(_ChannelListIndex)
+            .Visible = True
+        End With
     End Sub
-    Public Sub SetClosed(ByVal _ChannelListIndex As Integer)
-        Try
-            With lChannelLists.cChannelList(_ChannelListIndex)
-                .cVisible = False
-                .cWindow = Nothing
-            End With
-        Catch ex As Exception
-            Throw ex
-        End Try
+    Public Sub SetClosed(ByVal channelListID As Integer)
+        With lChannelLists.cChannelList(channelListID)
+            .Visible = False
+            .Window = Nothing
+        End With
     End Sub
 End Class

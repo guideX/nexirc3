@@ -1,11 +1,13 @@
 ﻿//nexIRC 3.0.31
 //Sunday, Oct 4th, 2014 - guideX
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 namespace nexIRC.Business.Helpers {
     public static class IniFileHelper {
+        public static int ReadIniInt(string file, string section, string key, int defaultt = 0) {
+            return ReadINI(file, section, key, defaultt.ToString()).ToInt(defaultt);
+        }
         /// <summary>
         /// Reading of INI Files
         /// </summary>

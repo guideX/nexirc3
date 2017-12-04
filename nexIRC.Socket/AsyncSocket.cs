@@ -1,165 +1,214 @@
-﻿//nexIRC 3.0.31
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
+﻿using System;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using nexIRC.Sockets.Interfaces;
 namespace nexIRC.Sockets {
-    public class AsyncSocket {
+    /// <summary>
+    /// Async Socket
+    /// </summary>
+    public class AsyncSocket : IAsyncSocket {
+        #region "events"
+        /// <summary>
+        /// Socket Disconnected
+        /// </summary>
         public event SocketDisconnectedEventHandler SocketDisconnected;
-        public delegate void SocketDisconnectedEventHandler(string SocketID);
+        /// <summary>
+        /// Socket Data Arrival Event Handler
+        /// </summary>
         public event SocketDataArrivalEventHandler SocketDataArrival;
-        public delegate void SocketDataArrivalEventHandler(string SocketID, string SocketData, byte[] lBytes, int lBytesRead);
+        /// <summary>
+        /// Socket Connected
+        /// </summary>
         public event SocketConnectedEventHandler SocketConnected;
-        public delegate void SocketConnectedEventHandler(string SocketID);
+        /// <summary>
+        /// Could Not Connect
+        /// </summary>
         public event CouldNotConnectEventHandler CouldNotConnect;
-        public delegate void CouldNotConnectEventHandler(string SocketID);
-        private string _socketId;
+        #endregion
+        #region "delegates"
+        /// <summary>
+        /// Socket Disconnected Event Handler
+        /// </summary>
+        /// <param name="socketID"></param>
+        public delegate void SocketDisconnectedEventHandler(string socketID);
+        /// <summary>
+        /// Socket Data Arrival Event Handler
+        /// </summary>
+        /// <param name="socketID"></param>
+        /// <param name="data"></param>
+        /// <param name="bytes"></param>
+        /// <param name="bytesRead"></param>
+        public delegate void SocketDataArrivalEventHandler(string socketID, string data, byte[] bytes, int bytesRead);
+        /// <summary>
+        /// Socket Connected Event Handler
+        /// </summary>
+        /// <param name="SocketID"></param>
+        public delegate void SocketConnectedEventHandler(string socketID);
+        /// <summary>
+        /// Could Not Connect Event Handler
+        /// </summary>
+        /// <param name="socketID"></param>
+        public delegate void CouldNotConnectEventHandler(string socketID);
+        #endregion
+        #region "variables"
+        /// <summary>
+        /// Socket ID
+        /// </summary>
+        private string _socketID;
+        /// <summary>
+        /// Temp Socket
+        /// </summary>
         private Socket _tempSocket;
-        public AsyncSocket(Socket tmp_Socket, string tmp_SocketID) {
-            try {
-                _socketId = tmp_SocketID;
-                _tempSocket = tmp_Socket;
-                var obj_Socket = tmp_Socket;
-                var obj_SocketState = new StateObject();
-                obj_SocketState.WorkSocket = obj_Socket;
-                obj_Socket.BeginReceive(obj_SocketState.Buffer, 0, obj_SocketState.BufferSize, 0, new AsyncCallback(onDataArrival), obj_SocketState);
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Port
+        /// </summary>
+        private int _port;
+        /// <summary>
+        /// Use Data Arrival Buffer
+        /// </summary>
+        private bool _useDataArrivalBuffer;
+        #endregion
+        #region "properties"
+        /// <summary>
+        /// Socket ID
+        /// </summary>
+        public string SocketID {
+            get {
+                return _socketID;
             }
         }
+        /// <summary>
+        /// Connected
+        /// </summary>
         public bool Connected {
             get {
-                try {
-                    return (_tempSocket.Connected);
-                } catch (Exception ex) {
-                    throw ex;
-                }
+                return _tempSocket.Connected;
             }
         }
-        public AsyncSocket() {
-            try {
-                _tempSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Port
+        /// </summary>
+        public int Port {
+            get {
+                return _port;
             }
         }
-        public void SendBytes(byte[] Buffer) {
-            try {
-                var obj_StateObject = new StateObject();
-                obj_StateObject.WorkSocket = _tempSocket;
-                _tempSocket.BeginSend(Buffer, 0, Buffer.Length, 0, new AsyncCallback(onSendComplete), obj_StateObject);
-            } catch (Exception ex) {
-                throw ex;
-            }
+        #endregion
+        #region "methods"
+        /// <summary>
+        /// Async Socket - Default Constructor
+        /// </summary>
+        public AsyncSocket(bool useDataArrivalBuffer = false) {
+            _tempSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _useDataArrivalBuffer = useDataArrivalBuffer;
         }
-        public void Send(string tmp_Data) {
-            try {
-                var obj_StateObject = new StateObject();
-                obj_StateObject.WorkSocket = _tempSocket;
-                var Buffer = Encoding.UTF8.GetBytes(tmp_Data);
-                _tempSocket.BeginSend(Buffer, 0, Buffer.Length, 0, new AsyncCallback(onSendComplete), obj_StateObject);
-            } catch (Exception ex) {
-                throw ex;
-            }
+        /// <summary>
+        /// Entry Point - Connection Accept
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="socketID"></param>
+        public AsyncSocket(Socket socket, string socketID, bool useDataArrivalBuffer = false) {
+            _useDataArrivalBuffer = useDataArrivalBuffer;
+            _socketID = socketID;
+            _tempSocket = socket;
+            var state = new StateObject();
+            state.Socket = socket;
+            socket.BeginReceive(state.Buffer, 0, state.BufferSize, 0, new AsyncCallback(onDataArrival), state);
         }
+        /// <summary>
+        /// Send Bytes
+        /// </summary>
+        /// <param name="buffer"></param>
+        public void Send(byte[] buffer) {
+            var state = new StateObject();
+            state.Socket = _tempSocket;
+            _tempSocket.BeginSend(buffer, 0, buffer.Length, 0, new AsyncCallback(onSendComplete), state);
+        }
+        /// <summary>
+        /// Send String
+        /// </summary>
+        /// <param name="data"></param>
+        public void Send(string data) {
+            if (data != null) return;
+            var state = new StateObject();
+            state.Socket = _tempSocket;
+            var buffer = Encoding.UTF8.GetBytes(data);
+            _tempSocket.BeginSend(buffer, 0, buffer.Length, 0, new AsyncCallback(onSendComplete), state);
+        }
+        /// <summary>
+        /// Close
+        /// </summary>
         public void Close() {
-            try {
-                _tempSocket.Shutdown(SocketShutdown.Both);
-                _tempSocket.Close();
-            } catch (Exception ex) {
-                throw ex;
-            }
+            _tempSocket.Shutdown(SocketShutdown.Both);
+            _tempSocket.Close();
         }
-        public void Connect(string hostIP, long hostPort) {
-            try {
-                var hostEndPoint = new IPEndPoint(Dns.Resolve(hostIP).AddressList[0], Convert.ToInt32(hostPort));
-                var obj_Socket = _tempSocket;
-                obj_Socket.BeginConnect(hostEndPoint, new AsyncCallback(onConnectionComplete), obj_Socket);
-            } catch (Exception ex) {
-                throw ex;
-            }
+        /// <summary>
+        /// Connect
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        public void Connect(string ip, int port) {
+            var hostEndPoint = new IPEndPoint(Dns.GetHostEntry(ip).AddressList[0], port);
+            var obj_Socket = _tempSocket;
+            obj_Socket.BeginConnect(hostEndPoint, new AsyncCallback(onConnectionComplete), obj_Socket);
+            _port = port;
         }
+        /// <summary>
+        /// On Data Arrival
+        /// </summary>
+        /// <param name="ar"></param>
         private void onDataArrival(IAsyncResult ar) {
             try {
-                var obj_SocketState = (StateObject)ar.AsyncState;
-                var obj_Socket = obj_SocketState.WorkSocket;
-                string sck_Data = null;
-                int BytesRead = obj_Socket.EndReceive(ar);
-                if (BytesRead > 0) {
-                    sck_Data = Encoding.UTF8.GetString(obj_SocketState.Buffer, 0, BytesRead);
+                var state = (StateObject)ar.AsyncState;
+                var socket = state.Socket;
+                var b = socket.EndReceive(ar);
+                if (b > 0) {
+                    var data = Encoding.UTF8.GetString(state.Buffer, 0, b);
                     if (SocketDataArrival != null) {
-                        SocketDataArrival(_socketId, sck_Data, obj_SocketState.Buffer, BytesRead);
+                        if (_useDataArrivalBuffer) {
+                            SocketDataArrival(_socketID, data, state.Buffer, b);
+                        } else {
+                            SocketDataArrival(_socketID, data, null, 0);
+                        }
                     }
                 }
-                obj_Socket.BeginReceive(obj_SocketState.Buffer, 0, obj_SocketState.BufferSize, 0, new AsyncCallback(onDataArrival), obj_SocketState);
+                socket.BeginReceive(state.Buffer, 0, state.BufferSize, SocketFlags.None, new AsyncCallback(onDataArrival), state);
             } catch (SocketException) {
-                if (SocketDisconnected != null) {
-                    SocketDisconnected(SocketID);
-                }
-                //throw sex;
+                if (SocketDisconnected != null) SocketDisconnected(_socketID);
             } catch (Exception ex) {
-                if (SocketDisconnected != null) {
-                    SocketDisconnected(SocketID);
-                }
-                if ((!ex.Message.Contains("Cannot access a disposed object"))) {
-                    throw ex;
-                }
+                if (SocketDisconnected != null) SocketDisconnected(_socketID);
+                if ((!ex.Message.Contains("Cannot access a disposed object"))) throw;
             }
         }
-        public string ReturnLocalIp() {
-            try {
-                return new WebClient().DownloadString("http://www.whatismyip.com/automation/n09230945.asp");
-            } catch (Exception ex) {
-                throw ex;
-            }
-        }
-        public long ReturnLocalPort() {
-            try {
-                return Convert.ToInt64(((IPEndPoint)_tempSocket.LocalEndPoint).Port);
-            } catch (Exception ex) {
-                throw ex;
-            }
-        }
+        /// <summary>
+        /// On Send Complete
+        /// </summary>
+        /// <param name="ar"></param>
         private void onSendComplete(IAsyncResult ar) {
-            try {
-                var obj_SocketState = (StateObject)ar.AsyncState;
-                var obj_Socket = obj_SocketState.WorkSocket;
-            } catch (Exception ex) {
-                throw ex;
-            }
+            var state = (StateObject)ar.AsyncState;
+            var socket = state.Socket;
         }
+        /// <summary>
+        /// On Connection Complete
+        /// </summary>
+        /// <param name="ar"></param>
         private void onConnectionComplete(IAsyncResult ar) {
             try {
                 _tempSocket = (Socket)ar.AsyncState;
                 _tempSocket.EndConnect(ar);
-                if (SocketConnected != null) {
-                    SocketConnected("null");
-                }
-                var socketState = new StateObject();
-                socketState.WorkSocket = _tempSocket;
-                _tempSocket.BeginReceive(socketState.Buffer, 0, socketState.BufferSize, 0, new AsyncCallback(onDataArrival), socketState);
+                if (SocketConnected != null) SocketConnected(null);
+                var state = new StateObject();
+                state.Socket = _tempSocket;
+                _tempSocket.BeginReceive(state.Buffer, 0, state.BufferSize, 0, new AsyncCallback(onDataArrival), state);
             } catch (Exception ex) {
                 if ((ex.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond"))) {
-                    if (CouldNotConnect != null) {
-                        CouldNotConnect(SocketID);
-                    }
+                    if (CouldNotConnect != null) CouldNotConnect(_socketID);
                 } else {
-                    throw ex;
+                    throw;
                 }
             }
         }
-        public string SocketID {
-            get {
-                try {
-                    return _socketId;
-                } catch (Exception ex) {
-                    throw ex;
-                }
-            }
-        }
+        #endregion
     }
 }

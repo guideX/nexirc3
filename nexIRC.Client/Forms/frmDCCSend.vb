@@ -5,6 +5,7 @@ Option Strict On
 Imports nexIRC.Modules
 Imports nexIRC.Sockets
 Imports nexIRC.Business.Helpers
+Imports nexIRC.Models.Files
 
 Public Class frmDCCSend
     Private WithEvents lListen As AsyncServer
@@ -21,20 +22,14 @@ Public Class frmDCCSend
     Private Delegate Sub StringDelegate(ByVal lData As String)
     Private Delegate Sub EmptyDelegate()
     Private lResponceData As String
-    Private Structure gFile
-        Public fFileNumber As Integer
-        Public fBufferSize As Long
-        Public fFileLength As Long
-        Public fBytesSent As Long
-    End Structure
-    Private lFile As gFile
+    Private lFile As FileModel
     Public Sub InitFile()
         With lFile
-            .fBufferSize = lSettings_DCC.lDCC.dBufferSize
-            .fFileNumber = FreeFile()
-            FileOpen(.fFileNumber, txtFilename.Text, OpenMode.Binary, OpenAccess.Read)
+            .BufferSize = lSettings_DCC.lDCC.dBufferSize
+            .FileNumber = FreeFile()
+            FileOpen(.FileNumber, txtFilename.Text, OpenMode.Binary, OpenAccess.Read)
             lFileOpen = True
-            .fFileLength = LOF(.fFileNumber)
+            .FileLength = LOF(.FileNumber)
             SendFileChunk("")
         End With
     End Sub
@@ -44,13 +39,13 @@ Public Class frmDCCSend
             lResponceData = lResponceData & Environment.NewLine & lData
             Clipboard.Clear()
             Clipboard.SetText(lResponceData)
-            If .fFileLength - Loc(.fFileNumber) <= .fBufferSize Then .fBufferSize = (.fFileLength - Loc(.fFileNumber))
-            If .fBufferSize = 0 Then Exit Sub
-            .fBytesSent = .fBytesSent + .fBufferSize
-            msg = Space(Convert.ToInt32(.fBufferSize))
-            FileGet(.fFileNumber, msg)
+            If .FileLength - Loc(.FileNumber) <= .BufferSize Then .BufferSize = (.FileLength - Loc(.FileNumber))
+            If .BufferSize = 0 Then Exit Sub
+            .BytesSent = .BytesSent + .BufferSize
+            msg = Space(Convert.ToInt32(.BufferSize))
+            FileGet(.FileNumber, msg)
             lSocket.Send(msg)
-            Me.Invoke(lSetProgress, .fBytesSent, .fFileLength)
+            Me.Invoke(lSetProgress, .BytesSent, .FileLength)
         End With
     End Sub
     Private Sub SetProgress(ByVal lBytesSent As Long, ByVal lLength As Long)
@@ -69,7 +64,7 @@ Public Class frmDCCSend
     End Sub
     Private Sub frmDCCSend_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
         IniFileHelper.WriteINI(lSettings.lINI.iDCC, "Settings", "DCCSendLastNick", cboNickname.Text)
-        If lFileOpen = True Then FileClose(lFile.fFileNumber)
+        If lFileOpen = True Then FileClose(lFile.FileNumber)
     End Sub
     Private Sub frmDCCSend_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim i As Integer

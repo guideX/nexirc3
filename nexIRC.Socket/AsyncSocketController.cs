@@ -1,119 +1,215 @@
-﻿//nexIRC 3.0.31
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
+﻿using System;
+using nexIRC.Sockets.Interfaces;
+using Telerik.WinControls.UI;
 namespace nexIRC.Sockets {
-    public class AsyncSocketController {
-        private SortedList _socketCol = new SortedList();
-        private AsyncServer withEventsField__serverSocket;
-        public event onConnectionAcceptEventHandler onConnectionAccept;
-        public delegate void onConnectionAcceptEventHandler(string socketID);
-        public event onSocketDisconnectedEventHandler onSocketDisconnected;
-        public delegate void onSocketDisconnectedEventHandler(string socketID);
-        public event onDataArrivalEventHandler onDataArrival;
-        public delegate void onDataArrivalEventHandler(string socketID, string socketData, byte[] bytes, int bytesRecieved);
-        private AsyncServer _serverSocket {
-            get { return withEventsField__serverSocket; }
-            set {
-                if (withEventsField__serverSocket != null) {
-                    withEventsField__serverSocket.ConnectionAccept -= m_ServerSocket_ConnectionAccept;
-                }
-                withEventsField__serverSocket = value;
-                if (withEventsField__serverSocket != null) {
-                    withEventsField__serverSocket.ConnectionAccept += m_ServerSocket_ConnectionAccept;
-                }
+    /// <summary>
+    /// Status Socket
+    /// </summary>
+    public class AsyncSocketController : IAsyncSocket {
+        #region "events"
+        /// <summary>
+        /// Form
+        /// </summary>
+        public RadForm InvokeForm;
+        /// <summary>
+        /// Socket Disconnected
+        /// </summary>
+        public event SocketDisconnectedEventHandler SocketDisconnected;
+        /// <summary>
+        /// Socket Data Arrival Event Handler
+        /// </summary>
+        public event SocketDataArrivalEventHandler SocketDataArrival;
+        /// <summary>
+        /// Socket Connected
+        /// </summary>
+        public event SocketConnectedEventHandler SocketConnected;
+        /// <summary>
+        /// Could Not Connect
+        /// </summary>
+        public event CouldNotConnectEventHandler CouldNotConnect;
+        #endregion
+        #region "delegates"
+        /// <summary>
+        /// Socket Disconnected Event Handler
+        /// </summary>
+        /// <param name="socketID"></param>
+        public delegate void SocketDisconnectedEventHandler(string socketID);
+        /// <summary>
+        /// Socket Data Arrival Event Handler
+        /// </summary>
+        /// <param name="socketID"></param>
+        /// <param name="data"></param>
+        /// <param name="bytes"></param>
+        /// <param name="bytesRead"></param>
+        public delegate void SocketDataArrivalEventHandler(string socketID, string data, byte[] bytes, int bytesRead);
+        /// <summary>
+        /// Socket Connected Event Handler
+        /// </summary>
+        /// <param name="SocketID"></param>
+        public delegate void SocketConnectedEventHandler(string socketID);
+        /// <summary>
+        /// Could Not Connect Event Handler
+        /// </summary>
+        /// <param name="socketID"></param>
+        public delegate void CouldNotConnectEventHandler(string socketID);
+        #endregion
+        #region "variables"
+        /// <summary>
+        /// Use Invoke Form
+        /// </summary>
+        private bool _useInvokeForm;
+        /// <summary>
+        /// Socket
+        /// </summary>
+        private AsyncSocket _socket;
+        #endregion
+        #region "methods"
+        /// <summary>
+        /// Socket Controller
+        /// </summary>
+        public AsyncSocketController(RadForm form, bool useDataArrivalBuffer = false, bool useInvokeForm = true) {
+            _useInvokeForm = useInvokeForm;
+            if (_useInvokeForm) InvokeForm = form;
+            _socket = new AsyncSocket(useDataArrivalBuffer);
+            _socket.SocketConnected += _socket_SocketConnected;
+            _socket.SocketDataArrival += _socket_SocketDataArrival;
+            _socket.SocketDisconnected += _socket_SocketDisconnected;
+            _socket.CouldNotConnect += _socket_CouldNotConnect;
+        }
+        /// <summary>
+        /// On Socket Could Not Connect
+        /// </summary>
+        /// <param name="socketID"></param>
+        private void onSocketCouldNotConnect(string socketID) {
+            if (CouldNotConnect != null) CouldNotConnect(socketID);
+        }
+        /// <summary>
+        /// On Socket Disconnected
+        /// </summary>
+        /// <param name="socketID"></param>
+        private void OnSocketDisconnected(string socketID) {
+            if (SocketDisconnected != null) SocketDisconnected(socketID);
+        }
+        /// <summary>
+        /// On Socket Connected
+        /// </summary>
+        /// <param name="socketID"></param>
+        private void OnSocketConnected(string socketID) {
+            if (SocketConnected != null) SocketConnected(socketID);
+        }
+        /// <summary>
+        /// On Socket Data Arrival
+        /// </summary>
+        /// <param name="socketID"></param>
+        /// <param name="data"></param>
+        /// <param name="bytes"></param>
+        /// <param name="bytesRead"></param>
+        private void OnSocketDataArrival(string socketID, string data, byte[] bytes, int bytesRead) {
+            if (SocketDataArrival != null) SocketDataArrival(socketID, data, bytes, bytesRead);
+        }
+        /// <summary>
+        /// Could Not Connect
+        /// </summary>
+        /// <param name="socketID"></param>
+        private void _socket_CouldNotConnect(string socketID) {
+            if (_useInvokeForm) {
+                var obj = new CouldNotConnectEventHandler(onSocketCouldNotConnect);
+                InvokeForm.Invoke(obj, socketID);
+            } else {
+                CouldNotConnect(SocketID);
             }
         }
-        public AsyncSocketController(int tmp_Port) {
-            try {
-                _serverSocket = new AsyncServer(tmp_Port);
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Socket Disconnected
+        /// </summary>
+        /// <param name="socketID"></param>
+        private void _socket_SocketDisconnected(string socketID) {
+            if (_useInvokeForm) {
+                var obj = new SocketDisconnectedEventHandler(OnSocketDisconnected);
+                InvokeForm.Invoke(obj, socketID);
+            } else {
+                SocketDisconnected(socketID);
             }
         }
-        public void Start() {
-            try {
-                _serverSocket.Start();
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Socket Data Arrival
+        /// </summary>
+        /// <param name="socketID"></param>
+        /// <param name="data"></param>
+        /// <param name="bytes"></param>
+        /// <param name="bytesRead"></param>
+        private void _socket_SocketDataArrival(string socketID, string data, byte[] bytes, int bytesRead) {
+            if (_useInvokeForm) {
+                var obj = new SocketDataArrivalEventHandler(OnSocketDataArrival);
+                InvokeForm.Invoke(obj, socketID, data, bytes, bytesRead);
+            } else {
+                SocketDataArrival(socketID, data, bytes, bytesRead);
             }
         }
-        public void StopServer() {
-            try {
-                _serverSocket.Close();
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Socket Connected
+        /// </summary>
+        /// <param name="socketID"></param>
+        private void _socket_SocketConnected(string socketID) {
+            if (_useInvokeForm) {
+                var obj = new SocketConnectedEventHandler(OnSocketConnected);
+                InvokeForm.Invoke(obj, socketID);
+            } else {
+                SocketConnected(socketID);
             }
         }
-        public void Send(string tmp_SocketID, string tmp_Data, bool tmp_Return = true) {
-            try {
-                if (tmp_Return == true) {
-                    ((AsyncSocket)_socketCol[tmp_SocketID]).Send(tmp_Data + Environment.NewLine);
-                } else {
-                    ((AsyncSocket)_socketCol[tmp_SocketID]).Send(tmp_Data);
-                }
-            } catch (Exception ex) {
-                throw ex;
-            }
-        }
-        public void Close(string tmp_SocketID) {
-            try {
-                ((AsyncSocket)_socketCol[tmp_SocketID]).Close();
-            } catch (Exception ex) {
-                throw ex;
-            }
-        }
-        public void Add(AsyncSocket tmp_Socket) {
-            try {
-                _socketCol.Add(tmp_Socket.SocketID, tmp_Socket);
-                tmp_Socket.SocketDisconnected += SocketDisconnected;
-                tmp_Socket.SocketDataArrival += SocketDataArrival;
-            } catch (Exception ex) {
-                throw ex;
-            }
-        }
-        public int Count {
+        /// <summary>
+        /// Port
+        /// </summary>
+        public int Port {
             get {
-                try {
-                    return _socketCol.Count;
-                } catch (Exception ex) {
-                    throw ex;
-                }
+                return _socket.Port;
             }
         }
-        private void m_ServerSocket_ConnectionAccept(AsyncSocket tmp_Socket) {
-            try {
-                Add(tmp_Socket);
-                if (onConnectionAccept != null) {
-                    onConnectionAccept(tmp_Socket.SocketID);
-                }
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Connected
+        /// </summary>
+        public bool Connected {
+            get {
+                return _socket.Connected;
             }
         }
-        private void SocketDisconnected(string socketId) {
-            try {
-                _socketCol.Remove(socketId);
-                if (onSocketDisconnected != null) {
-                    onSocketDisconnected(socketId);
-                }
-            } catch (Exception ex) {
-                throw ex;
+        /// <summary>
+        /// Socket ID
+        /// </summary>
+        public string SocketID {
+            get {
+                return _socket.SocketID;
             }
         }
-        private void SocketDataArrival(string socketId, string socketData, byte[] bytes, int bytesRecieved) {
-            try {
-                if (onDataArrival != null) {
-                    onDataArrival(socketId, socketData, bytes, bytesRecieved);
-                }
-            } catch (Exception ex) {
-                throw ex;
-            }
+        /// <summary>
+        /// Send
+        /// </summary>
+        /// <param name="data"></param>
+        public void Send(string data) {
+            _socket.Send(data);
         }
+        /// <summary>
+        /// Close
+        /// </summary>
+        public void Close() {
+            _socket.Close();
+        }
+        /// <summary>
+        /// Connect
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        public void Connect(string ip, int port) {
+            _socket.Connect(ip, port);
+        }
+        /// <summary>
+        /// Send
+        /// </summary>
+        /// <param name="buffer"></param>
+        public void Send(byte[] buffer) {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }

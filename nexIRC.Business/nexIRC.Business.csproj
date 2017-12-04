@@ -43,22 +43,39 @@
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.WinControls, Version=2011.2.11.831, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Debug\Telerik.WinControls.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Telerik\RadControls for WinForms Q2 2011\Bin\Telerik.WinControls.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.WinControls.RichTextBox, Version=2011.2.11.831, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Debug\Telerik.WinControls.RichTextBox.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Telerik\RadControls for WinForms Q2 2011\Bin\Net40\Telerik.WinControls.RichTextBox.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.WinControls.Themes.Office2010Black, Version=2011.2.11.831, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Telerik\RadControls for WinForms Q2 2011\Bin\Telerik.WinControls.Themes.Office2010Black.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.WinControls.UI, Version=2011.2.11.831, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Telerik\RadControls for WinForms Q2 2011\Bin\Telerik.WinControls.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="TelerikCommon, Version=2011.2.11.831, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Telerik\RadControls for WinForms Q2 2011\Bin\TelerikCommon.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\eDccFileExistsAction.cs" />
-    <Compile Include="Enums\eDccPrompt.cs" />
-    <Compile Include="Enums\IrcCommandTypes.cs" />
+    <Compile Include="Business\ChannelListBusiness.cs" />
+    <Compile Include="Business\DataArrivalBusiness.cs" />
+    <Compile Include="Business\NetworkBusiness.cs" />
+    <Compile Include="Business\ProgramBusiness.cs" />
+    <Compile Include="Business\ServerBusiness.cs" />
+    <Compile Include="Business\StatusBusiness.cs" />
+    <Compile Include="Extensions\DataTypeExtensions.cs" />
     <Compile Include="Helpers\IniFileHelper.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Interfaces\Base\IRepository.cs" />
-    <Compile Include="Models\ChannelFolderModel.cs" />
+    <Compile Include="Interfaces\IDataArrivalBusiness.cs" />
     <Compile Include="Models\IniFileInputModel.cs" />
+    <Compile Include="Objects\TimerObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Base\Repository.cs" />
     <Compile Include="Repositories\ChannelFolderSettings.cs" />
@@ -67,7 +84,27 @@
     <Compile Include="Repositories\NetworkSettings.cs" />
     <Compile Include="Repositories\QuerySettings.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\nexIRC.Enum\nexIRC.Enum.csproj">
+      <Project>{1a39a045-e5b4-40e9-981b-910d02d0c7cf}</Project>
+      <Name>nexIRC.Enum</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\nexIRC.Models\nexIRC.Models.csproj">
+      <Project>{A61225A9-6CBC-492A-A576-CFC0B6A6A960}</Project>
+      <Name>nexIRC.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\nexIRC.Socket\nexIRC.Sockets.csproj">
+      <Project>{B9E7C877-8236-4229-9628-83B21CD2B100}</Project>
+      <Name>nexIRC.Sockets2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\nexIRC.UI\nexIRC.UI.csproj">
+      <Project>{52554e28-bf47-43f3-9b58-d1fdcd69ad01}</Project>
+      <Name>nexIRC.UI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\FormInterfaces\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

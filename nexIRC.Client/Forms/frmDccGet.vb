@@ -17,7 +17,7 @@ Public Class frmDccGet
     Private lBinaryWriter As BinaryWriter
     Private lUser As String
     Private lRemoteIp As String
-    Private lRemotePort As String
+    Private lRemotePort As Integer
     Private lRemoteFileName As String
     Private lRemoteFileSize As String
     Private lLocalFileName As String
@@ -26,7 +26,7 @@ Public Class frmDccGet
     Private lFileOpen As Boolean
     Private lPacketSizeDelay As Integer = 1000
 
-    Public Sub InitDCCGet(ByVal lUsr As String, ByVal lRemIp As String, ByVal lRemPort As String, ByVal lFileName As String, ByVal lFileSize As String)
+    Public Sub InitDCCGet(ByVal lUsr As String, ByVal lRemIp As String, ByVal lRemPort As Integer, ByVal lFileName As String, ByVal lFileSize As String)
         Try
             lUser = lUsr
             lRemoteIp = lRemIp
@@ -38,7 +38,7 @@ Public Class frmDccGet
             lRemoteFileSize = Replace(lRemoteFileSize, " ", "")
             lblNickname.Text = lUsr
             lblIp.Text = lStrings.DecodeLongIPAddr(lRemIp)
-            lblPort.Text = lRemPort
+            lblPort.Text = lRemPort.ToString
             lblSize.Text = lFileSize
             lblFilename.Text = lFileName
             ProgressBar1.Maximum = CType(lRemoteFileSize, Integer)
@@ -103,7 +103,7 @@ Public Class frmDccGet
                 End If
             End If
             cmdRun.Enabled = False
-            lSocket.Connect(lStrings.DecodeLongIPAddr(lRemoteIp), Convert.ToInt64(Trim(lRemotePort)))
+            lSocket.Connect(lStrings.DecodeLongIPAddr(lRemoteIp), lRemotePort)
         Catch ex As Exception
             Throw ex
         End Try
@@ -147,7 +147,7 @@ Public Class frmDccGet
                 ProgressBar1.Value1 = Convert.ToInt32(lBytesRecievedCount)
                 ProgressBar1.Value2 = Convert.ToInt32(lBytesRecievedCount)
                 If Convert.ToInt32(lBytesRecievedCount) = Convert.ToInt32(lRemoteFileSize) Then
-                    lSocket.SendBytes(BytesToChars(lBytesRecievedCount))
+                    lSocket.Send(BytesToChars(lBytesRecievedCount))
                     tmrDelayEndTransfer.Enabled = True
                     Exit Sub
                 End If

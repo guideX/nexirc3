@@ -182,7 +182,7 @@ Namespace nexIRC.MainWindow
             _Form.Width = Convert.ToInt32(Trim(IniFileHelper.ReadINI(lSettings.lINI.iIRC, "mdiMain", "Width", Convert.ToString(_Form.Width))))
             _Form.Height = Convert.ToInt32(Trim(IniFileHelper.ReadINI(lSettings.lINI.iIRC, "mdiMain", "Height", Convert.ToString(_Form.Height))))
             If lSettings.lIRC.iIdent.iSettings.iEnabled = True Then
-                lIdent.Listen(113)
+                'lIdent.Listen(113)
             End If
             SetLoadingFormProgress("Loading Complete", 100)
             lLoadingForm.Close()
@@ -738,7 +738,7 @@ Namespace nexIRC.MainWindow
                 _ToolStrip.Visible = False
                 _DCCToolBarToolStrip.Visible = False
                 _ToolStrip.Visible = True
-                lForm.InitDCCGet(splt(0), splt(1), splt(2), splt(3), splt(4))
+                lForm.InitDCCGet(splt(0), splt(1), Convert.ToInt32(splt(2)), splt(3), splt(4))
                 lForm.Show()
             Catch ex As Exception
                 Throw ex 'ProcessError(ex.Message, "Public Sub cmdAccept_Click()")

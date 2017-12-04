@@ -2,12 +2,10 @@
 'Sunday, Oct 4th, 2014 - guideX
 Option Explicit On
 Option Strict On
-Imports nexIRC.Settings
 Imports nexIRC.Modules
-Imports System.Net
-Imports nexIRC.Settings2
 Imports nexIRC.Business.Helpers
 Imports nexIRC.Business.Enums
+Imports nexIRC.Business.Repositories
 
 Namespace nexIRC.IRC.Settings
     Public Class clsDCC
@@ -52,7 +50,7 @@ Namespace nexIRC.IRC.Settings
                     .dBufferSize = Convert.ToInt64(Trim(IniFileHelper.ReadINI(lSettings.lINI.iDCC, "Settings", "BufferSize", "1024")))
                     .dUseIpAddress = Convert.ToBoolean(Trim(IniFileHelper.ReadINI(lSettings.lINI.iDCC, "Settings", "UseIpAddress", "False")))
                     .dCustomIpAddress = IniFileHelper.ReadINI(lSettings.lINI.iDCC, "Settings", "CustomIpAddress", "")
-                    If Len(.dCustomIpAddress) = 0 Then .dCustomIpAddress = DccSettings.ReturnOutsideIPAddress()
+                    If Len(.dCustomIpAddress) = 0 Then .dCustomIpAddress = DccSettings.IpAddress()
                     .dIgnorelist.dCount = Convert.ToInt32(Trim(IniFileHelper.ReadINI(lSettings.lINI.iDCC, "Settings", "IgnoreCount", "0")))
                     .dSendPort = IniFileHelper.ReadINI(lSettings.lINI.iDCC, "Settings", "SendPort", "1024")
                     .dRandomizePort = Convert.ToBoolean(Trim(IniFileHelper.ReadINI(lSettings.lINI.iDCC, "Settings", "RandomizePort", "True")))

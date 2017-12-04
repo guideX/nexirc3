@@ -530,38 +530,34 @@ Namespace IRC.Customize
         'End Try
         'End Sub
 
-        Public Sub RefreshServers(ByVal _RadListView As RadListView, ByVal _NetworkIndex As Integer)
-            Try
-                Dim i As Integer, t As Integer = 0, _Ip As String = "", _Port As String = "", n As Integer = -1
-                _RadListView.Items.Clear()
-                If _NetworkIndex <> 0 Then
+        Public Sub RefreshServers(ByVal rlv As RadListView, ByVal networkIndex As Integer)
+            Dim i As Integer, t As Integer = 0, _Ip As String = "", _Port As String = "", n As Integer = -1
+            rlv.Items.Clear()
+                If networkIndex <> 0 Then
                     For i = 1 To lSettings.lServers.sCount
                         With lSettings.lServers.sServer(i)
                             If Len(.sDescription) <> 0 Then
-                                If .sNetworkIndex = _NetworkIndex Then
+                                If .sNetworkIndex = networkIndex Then
                                     Dim _Values(2) As String
                                     _Values(0) = .sDescription
                                     _Values(1) = .sIP
                                     _Values(2) = .sPort.ToString
-                                    _RadListView.Items.Add(New ListViewDataItem(.sDescription, _Values))
+                                    rlv.Items.Add(New ListViewDataItem(.sDescription, _Values))
                                     If String.IsNullOrEmpty(_Ip) = True Then _Ip = .sIP
                                     If String.IsNullOrEmpty(_Port) = True Then _Port = .sPort.ToString
                                 End If
                             End If
                         End With
                     Next i
-                    For Each _DataItem As ListViewDataItem In _RadListView.Items
+                    For Each _DataItem As ListViewDataItem In rlv.Items
                         If _DataItem.Text = lSettings.lServers.sServer(lSettings.lServers.sIndex).sDescription Then
                             n = t
                             Exit For
                         End If
                         t = t + 1
                     Next _DataItem
-                    _RadListView.SelectedIndex = n
+                    rlv.SelectedIndex = n
                 End If
-            Catch ex As Exception
-                Throw ex 'ProcessError(ex.Message, "Public Sub RefreshServers(ByVal lFirstLoad As Boolean)")
-            End Try
         End Sub
         Public Sub txtNotifyNetwork_TextChanged(ByVal _NotifyNetwork As String, ByVal _NotifyListView As RadListView)
             Try

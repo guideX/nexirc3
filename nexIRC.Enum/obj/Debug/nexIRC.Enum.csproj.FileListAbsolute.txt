@@ -1,0 +1,5 @@
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Enum\bin\Debug\nexIRC.Enum.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Enum\bin\Debug\nexIRC.Enum.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Enum\obj\Debug\nexIRC.Enum.csprojResolveAssemblyReference.cache
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Enum\obj\Debug\nexIRC.Enum.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Enum\obj\Debug\nexIRC.Enum.pdb

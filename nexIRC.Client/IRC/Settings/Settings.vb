@@ -660,37 +660,15 @@ Public Class Settings
     End Sub
 
     Private Sub LoadServers()
-        Dim msg As String, msg2 As String, splt() As String, splt2() As String
-        Dim lIndex As Integer
-        ReDim lServers.sServer(lArraySizes.aServers)
-        msg2 = My.Computer.FileSystem.ReadAllText(lINI.iServers)
-        splt = Split(msg2, Environment.NewLine)
-        For Each msg In splt
-            If LCase(msg) = "[settings]" Then
-            Else
-                If Left(msg, 1) = "[" And Right(msg, 1) = "]" Then
-                    lIndex = Convert.ToInt32(Trim(TextHelper.ParseData(msg, "[", "]")))
-                    lServers.sCount = lIndex
-                Else
-                    splt2 = Split(msg, "=")
-                    Select Case LCase(splt2(0))
-                        Case "count"
-                            lServers.sCount = Convert.ToInt32(Trim(splt2(1)))
-                        Case "index"
-                            lServers.sIndex = Convert.ToInt32(Trim(splt2(1)))
-                        Case "description"
-                            lServers.sServer(lIndex).sDescription = splt2(1).ToString
-                        Case "ip"
-                            lServers.sServer(lIndex).sIP = splt2(1).ToString
-                        Case "networkindex"
-                            lServers.sServer(lIndex).sNetworkIndex = Convert.ToInt32(Trim(splt2(1)))
-                        Case "port"
-                            lServers.sServer(lIndex).sPort = Convert.ToInt32(Trim(splt2(1).ToString))
-                    End Select
-                End If
-            End If
-        Next msg
-        If Err.Number <> 0 Then MsgBox(Err.Description)
+        lServers.sCount = Convert.ToInt32(IniFileHelper.ReadINI(lINI.iServers, "Settings", "Count", "0"))
+        lServers.sIndex = Convert.ToInt32(IniFileHelper.ReadINI(lINI.iServers, "Settings", "Index", "0"))
+        ReDim lServers.sServer(lServers.sCount)
+        For i As Integer = 1 To lServers.sCount
+            lServers.sServer(i).sDescription = IniFileHelper.ReadINI(lINI.iServers, i.ToString(), "Description", "")
+            lServers.sServer(i).sIP = IniFileHelper.ReadINI(lINI.iServers, i.ToString(), "IP", "")
+            lServers.sServer(i).sPort = Convert.ToInt32(IniFileHelper.ReadINI(lINI.iServers, i.ToString(), "Port", "0"))
+            lServers.sServer(i).sNetworkIndex = Convert.ToInt32(IniFileHelper.ReadINI(lINI.iServers, i.ToString(), "NetworkIndex", "0"))
+        Next i
     End Sub
 
     Public Sub LoadStringSettings()

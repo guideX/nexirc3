@@ -1,0 +1,13 @@
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\Telerik.WinControls.UI.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\Telerik.WinControls.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\obj\Debug\nexIRC.Models.csprojResolveAssemblyReference.cache
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\nexIRC.Models.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\nexIRC.Models.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\nexIRC.Sockets.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\Telerik.WinControls.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\Telerik.WinControls.UI.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\TelerikCommon.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\nexIRC.Sockets.pdb
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\bin\Debug\TelerikCommon.xml
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\obj\Debug\nexIRC.Models.dll
+C:\dev\team-nexgen\nexIRC\nexIRC3\nexIRC.Models\obj\Debug\nexIRC.Models.pdb

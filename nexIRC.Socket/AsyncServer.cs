@@ -1,65 +1,77 @@
-﻿//nexIRC 3.0.31
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Text;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 namespace nexIRC.Sockets {
+    /// <summary>
+    /// Async Server
+    /// </summary>
     public class AsyncServer {
+        #region "events"
+        /// <summary>
+        /// Connection Accept
+        /// </summary>
         public event ConnectionAcceptEventHandler ConnectionAccept;
-        public delegate void ConnectionAcceptEventHandler(AsyncSocket tmp_Socket);
+        /// <summary>
+        /// Connection Accept Event Handler
+        /// </summary>
+        /// <param name="socket"></param>
+        public delegate void ConnectionAcceptEventHandler(AsyncSocket socket);
+        #endregion
+        #region "variables"
+        /// <summary>
+        /// Closed
+        /// </summary>
         private bool _closed;
+        /// <summary>
+        /// Socket Port
+        /// </summary>
         private int _socketPort;
+        #endregion
+        #region "methods"
+        /// <summary>
+        /// Entry Point
+        /// </summary>
+        /// <param name="port"></param>
         public AsyncServer(int port) {
-            try {
-                _socketPort = port;
-            } catch (Exception ex) {
-                throw ex;
-            }
+            _socketPort = port;
         }
+        /// <summary>
+        /// Start
+        /// </summary>
         public void Start() {
-            try {
-                var listenIP = IPAddress.Any;
-                var listenPort = _socketPort;
-                var listenEp = new IPEndPoint(listenIP, listenPort);
-                if (_closed == true) {
-                    _closed = false;
-                    return;
-                }
-                var obj_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                obj_Socket.Bind(listenEp);
-                obj_Socket.Listen(100);
-                obj_Socket.BeginAccept(new AsyncCallback(onIncomingConnection), obj_Socket);
-            } catch (Exception ex) {
-                throw ex;
+            var ip = IPAddress.Any;
+            var port = _socketPort;
+            var ep = new IPEndPoint(ip, port);
+            if (_closed == true) {
+                _closed = false;
+                return;
             }
+            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Bind(ep);
+            socket.Listen(100);
+            socket.BeginAccept(new AsyncCallback(onIncomingConnection), socket);
         }
+        /// <summary>
+        /// Close
+        /// </summary>
         public void Close() {
-            try {
-                _closed = true;
-            } catch (Exception ex) {
-                throw ex;
-            }
+            _closed = true;
         }
+        /// <summary>
+        /// On Incoming Connection
+        /// </summary>
+        /// <param name="result"></param>
         private void onIncomingConnection(IAsyncResult result) {
-            try {
-                var obj_Socket = (Socket)result.AsyncState;
-                var obj_Connected = obj_Socket.EndAccept(result);
-                if ((_closed == true)) {
-                    obj_Connected.Shutdown(SocketShutdown.Both);
-                    obj_Connected.Close();
-                } else {
-                    if (ConnectionAccept != null) {
-                        ConnectionAccept(new AsyncSocket(obj_Connected, System.Guid.NewGuid().ToString()));
-                    }
-                }
-                obj_Socket.BeginAccept(new AsyncCallback(onIncomingConnection), obj_Socket);
-            } catch (Exception ex) {
-                throw ex;
+            var socket = (Socket)result.AsyncState;
+            var connected = socket.EndAccept(result);
+            if ((_closed == true)) {
+                connected.Shutdown(SocketShutdown.Both);
+                connected.Close();
+            } else {
+                if (ConnectionAccept != null) ConnectionAccept(new AsyncSocket(connected, System.Guid.NewGuid().ToString()));
             }
+            socket.BeginAccept(new AsyncCallback(onIncomingConnection), socket);
         }
+        #endregion
     }
 }

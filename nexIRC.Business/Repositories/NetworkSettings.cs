@@ -175,6 +175,7 @@ namespace nexIRC.IrcSettings {
         public NetworkData GetById(int networkId) {
             try {
                 var network = new NetworkData();
+                network.Id = networkId;
                 network.Description = IniFileHelper.ReadINI(_iniFile, networkId.ToString(), "Description", "");
                 return network;
             } catch (Exception ex) {
